@@ -3,7 +3,7 @@ import math
 
 import numpy as np
 import matplotlib.pyplot as plt
-import streamlit as st # Import Streamlit
+import streamlit as st 
 
 from tensorflow.keras.models import load_model, Model
 from tensorflow.keras.datasets import mnist
@@ -27,12 +27,10 @@ st.write("Selecciona un dígito para generar imagenes.")
 
 @st.cache_resource # Cargar el modelo solo una vez y cachéarlo
 def load_acgan_model():
-    # Ensure the model file is accessible.
-    # If acgan_mnist.h5 is in the same directory as this script, it will find it.
     model_path = "acgan_mnist.h5"
     if not os.path.exists(model_path):
-        st.error(f"Error: El archivo del modelo '{model_path}' no se encontró. Asegúrate de que esté en la misma carpeta que 'streamlit_app.py'.")
-        st.stop() # Stop the app if the model isn't found
+        st.error(f"Error: El archivo del modelo '{model_path}' no se encontró. Revisar que esté en la misma carpeta que el main.")
+        st.stop() # Parar la app si no se encuentra el archivo
     return load_model(model_path)
 
 trained_generator = load_acgan_model()
@@ -45,11 +43,11 @@ selected_label = st.sidebar.slider(
     "Selecciona el dígito a generar:",
     min_value=0,
     max_value=9,
-    value=0, # Default value
+    value=0, # Valor por defecto
     step=1
 )
 
-# --- Funcuion plot adaptada para Streamlit ---
+# --- Funcion plot adaptada para Streamlit ---
 def generate_and_plot_acgan(generator, latent_size, num_classes, class_label):
     st.subheader(f"Generando imágenes para el dígito: {class_label}")
 
@@ -59,11 +57,11 @@ def generate_and_plot_acgan(generator, latent_size, num_classes, class_label):
     # Generator expects labels with shape (batch_size, 1)
     noise_class_input = noise_class_labels.reshape(-1, 1)
     
-    # Predict images - add st.spinner for user feedback during prediction
+    # Predict images -  st.spinner, es un spinner para indicar que se están generando las imágenes
     with st.spinner("Generando imágenes..."):
-        images = generator.predict([noise_input, noise_class_input], verbose=0) # verbose=0 to suppress Keras output
+        images = generator.predict([noise_input, noise_class_input], verbose=0) # verbose=0 tpara no mostrar la salida de keras
 
-    fig, ax = plt.subplots(figsize=(8, 8)) # Aumentado para más claridad en Streamlit
+    fig, ax = plt.subplots(figsize=(8, 8))
     num_images = images.shape[0]
     image_size = images.shape[1]
     rows = int(math.sqrt(num_images))
@@ -78,11 +76,10 @@ def generate_and_plot_acgan(generator, latent_size, num_classes, class_label):
 
     plt.tight_layout() # Ajustar espaciado
     
-    # Display the plot in Streamlit
-    st.pyplot(fig) # Pass the figure object to st.pyplot
-    plt.close(fig) # Close the figure to free up memory
+    st.pyplot(fig) # Mostrar la figura en Streamlit
+    plt.close(fig) 
 
-# --- Run the generation when the app loads or the slider changes ---
+# Correr el modelo cuando se cargue la app o cambie el valor del slider
 if st.sidebar.button("Generar Imágenes") or st.session_state.get('initial_run', True):
     generate_and_plot_acgan(trained_generator, latent_size, num_classes, selected_label)
     st.session_state['initial_run'] = False # Set to False after first run
