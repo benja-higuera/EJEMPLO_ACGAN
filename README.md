@@ -1,1 +1,1 @@
-Ejemplo de uso de la libreria Streamlit para el curos IMA543
+Ejemplo de uso de la libreria Streamlit para el curso IMA543
